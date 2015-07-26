@@ -32,9 +32,9 @@ def load_images(count):
 
 def save_images(images, dir):
     """
-    Save images to folder
+    Save images to directory
     :param images: dict where keys are titles and values are raw image data
-    :param folder: directory for images
+    :param dir: directory for images
     """
 
     if not os.path.exists(dir):
