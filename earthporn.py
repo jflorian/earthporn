@@ -41,7 +41,7 @@ def save_images(images, dir):
         os.makedirs(dir)
 
     for title, data in images.items():
-        with open(os.path.join(dir, title), 'wb') as img_file:
+        with open(os.path.join(dir, title) + '.jpg', 'wb') as img_file:
             img_file.write(data)
 
 
