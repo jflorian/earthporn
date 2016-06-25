@@ -182,6 +182,7 @@ if __name__ == '__main__':
         'count': 10,
         'dest': '~/Pictures',
         'keepcount': -1,
+        'resolution': '1920x1080',
     }
     try:
         with open('earthporn.yaml', 'r') as f:
@@ -193,9 +194,14 @@ if __name__ == '__main__':
     parser.add_argument('--count', '-c', help='number of images (max = 100)', type=int, default=config.get('count'))
     parser.add_argument('--dest', '-d', help='destination directory', type=str, default=config.get('dest'))
     parser.add_argument('--keepcount', '-k', help='number of images to keep in the directory (> count)', type=int, default=config.get('keepcount'))
+    parser.add_argument('--resolution', '-r', help='resolution of the display, to filter out images that do not look good', type=str, default=config.get('resolution'))
     args = parser.parse_args()
     
     logging.debug('Starting with config: %r', args)
+    
+    res = args.resolution
+    if res:
+        TARGET_RESOLUTION = Resolution(*map(int, res.split('x')))
     main(args.count, args.dest, args.keepcount)
     logging.debug('Done.')
     sys.exit(0)
