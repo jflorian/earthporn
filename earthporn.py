@@ -114,10 +114,10 @@ def filtered_images(children, count):
             else:
                 source_image = thread['data']['preview']['images'][0]['source']
             res_ = Resolution(source_image['width'], source_image['height'])
-        except (KeyError, IndexError) as e:
+        except (KeyError, IndexError):
             # No image
             continue
-        except (ValueError, TypeError) as e:
+        except (ValueError, TypeError):
             # Probably the integers of width and height
             continue
         else:
