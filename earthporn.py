@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 
-import requests
 import argparse
-import os
-import string
-from pathlib import Path
-import logging
 import logging.config
-import yaml
+import os
+import re
+import string
 import sys
 from collections import namedtuple
-import re
+from pathlib import Path
+
+import requests
+import yaml
 
 logger = logging.getLogger('earthporn')
 
@@ -25,13 +25,14 @@ TARGET_RESOLUTION = Resolution(1920, 1080)
 ACCEPTABLE_DIFFERENCE = 90
 MAX_FILENAME_LENGTH = 30
 
-
 # From Reddit Enhancement Suite
-FLICKR_RE = re.compile('^https?:\/\/(?:\w+\.)?flickr\.com\/(?:.+)\/(\d{10,})(?:\/|$)')
+FLICKR_RE = re.compile(
+    '^https?:\/\/(?:\w+\.)?flickr\.com\/(?:.+)\/(\d{10,})(?:\/|$)')
 
 
 def safe_filename(title):
-    return ''.join(c for c in title.replace(' ', '_') if c in VALID_CHARS).strip(' _.-()')
+    return ''.join(
+        c for c in title.replace(' ', '_') if c in VALID_CHARS).strip(' _.-()')
 
 
 def get_filepath(destdir, title):
@@ -48,21 +49,24 @@ def keep_image(title, res):
 
     if W - w > 4 * ACCEPTABLE_DIFFERENCE:
         # Smaller width, landscape
-        logger.debug('{%22r} Bad width (%dx%d) than target (%dx%d) ', title, w, h, W, H)
+        logger.debug('{%22r} Bad width (%dx%d) than target (%dx%d) ', title, w,
+                     h, W, H)
         return False
     elif H - h > 4 * ACCEPTABLE_DIFFERENCE:
         # Smaller height, landscape
-        logger.debug('{%22r} Bad height (%dx%d) than target (%dx%d) ', title, w, h, W, H)
+        logger.debug('{%22r} Bad height (%dx%d) than target (%dx%d) ', title, w,
+                     h, W, H)
         return False
     elif w >= W:
         # Greater width if landscape
-        logger.debug('{%22r} Greater width (%dx%d) than target (%dx%d) ', title, w, h, W, H)
+        logger.debug('{%22r} Greater width (%dx%d) than target (%dx%d) ', title,
+                     w, h, W, H)
         return True
 
     if h > w:
         # Portrait
-        #~ # Reject
-        #~ return False
+        # ~ # Reject
+        # ~ return False
         # Flip the coordinates
         w, h = h, w
         W, H = H, W
@@ -70,11 +74,16 @@ def keep_image(title, res):
 
     if W * H - w * h < ACCEPTABLE_DIFFERENCE ** 2:
         # Greater width, landscape, overall higher resolution
-        logger.debug('{%22r} Bad resolution (%dx%d = %d) than target (%dx%d = %d) ', title, w, h, w * h, W, H, W * H)
+        logger.debug(
+            '{%22r} Bad resolution (%dx%d = %d) than target (%dx%d = %d) ',
+            title, w, h, w * h, W, H, W * H)
         return False
 
-    if W/H - w/h > ACCEPTABLE_DIFFERENCE / 200.0:
-        logger.debug('{%22r} Bad aspect ratio (%dx%d = %.3f) than target (%dx%d = %.3f) ', title, w, h, w/h, W, H, W/H)
+    if W / H - w / h > ACCEPTABLE_DIFFERENCE / 200.0:
+        logger.debug(
+            '{%22r} Bad aspect ratio (%dx%d = %.3f) than target (%dx%d = '
+            '%.3f) ',
+            title, w, h, w / h, W, H, W / H)
         return False
 
     logger.debug('{%22r} Seems fine (%dx%d)', title, w, h)
@@ -90,8 +99,11 @@ def filtered_images(children, count):
             continue
 
         try:
-            if thread['data']['domain'] == 'flickr.com' and FLICKR_RE.match(thread['data']['url']):
-                embed = requests.get('https://noembed.com/embed', params={'url': thread['data']['url']}).json()
+            if thread['data']['domain'] == 'flickr.com' and FLICKR_RE.match(
+                    thread['data']['url']):
+                embed = requests.get('https://noembed.com/embed', params={
+                    'url': thread['data']['url']
+                }).json()
                 source_image = {
                     'url': embed['media_url'],
                     'width': int(embed['width']),
@@ -123,10 +135,12 @@ def load_images(count):
     logger.info("Getting url %s with count %d", JSON_URL, count)
     earthporn_json = requests.get(JSON_URL, headers=HEADERS).json()
 
-    for thread, source_image in filtered_images(earthporn_json['data']['children'], count):
+    for thread, source_image in filtered_images(
+            earthporn_json['data']['children'], count):
         title = thread['data']['title']
         if len(title) > MAX_FILENAME_LENGTH:
-            title = title[:MAX_FILENAME_LENGTH//2] + '...' + title[-MAX_FILENAME_LENGTH//2:]
+            title = title[:MAX_FILENAME_LENGTH // 2] + '...' + \
+                    title[-MAX_FILENAME_LENGTH // 2:]
         title = '{}_{}'.format(thread['data']['id'], title)
         yield (title, source_image['url'])
 
@@ -159,7 +173,8 @@ def save_image(title, url, destdir):
 
 def keep_at_most(dest, count):
     rdir = Path(dest)
-    for f in sorted(rdir.glob(PREFIX_GLOB + '*' + SUFFIX_GLOB), key=lambda p: p.stat().st_mtime, reverse=True)[count:]:
+    for f in sorted(rdir.glob(PREFIX_GLOB + '*' + SUFFIX_GLOB),
+                    key=lambda p: p.stat().st_mtime, reverse=True)[count:]:
         logger.info("Deleting image %s", f)
         try:
             f.unlink()
@@ -191,11 +206,20 @@ if __name__ == '__main__':
     except:
         logging.warn('Config file earthporn.yaml not found')
 
-    parser = argparse.ArgumentParser(description='Download images from http://www.reddit.com/r/earthporn')
-    parser.add_argument('--count', '-c', help='number of images (max = 100)', type=int, default=config.get('count'))
-    parser.add_argument('--dest', '-d', help='destination directory', type=str, default=config.get('dest'))
-    parser.add_argument('--keepcount', '-k', help='number of images to keep in the directory (> count)', type=int, default=config.get('keepcount'))
-    parser.add_argument('--resolution', '-r', help='resolution of the display, to filter out images that do not look good', type=str, default=config.get('resolution'))
+    parser = argparse.ArgumentParser(
+        description='Download images from http://www.reddit.com/r/earthporn')
+    parser.add_argument('--count', '-c', help='number of images (max = 100)',
+                        type=int, default=config.get('count'))
+    parser.add_argument('--dest', '-d', help='destination directory', type=str,
+                        default=config.get('dest'))
+    parser.add_argument('--keepcount', '-k',
+                        help='number of images to keep in the directory (> '
+                             'count)',
+                        type=int, default=config.get('keepcount'))
+    parser.add_argument('--resolution', '-r',
+                        help='resolution of the display, to filter out images '
+                             'that do not look good',
+                        type=str, default=config.get('resolution'))
     args = parser.parse_args()
 
     logging.debug('Starting with config: %r', args)
