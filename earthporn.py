@@ -149,7 +149,7 @@ def save_images(images, destdir):
     """
     Save images to directory
     :param images: dict where keys are titles and values are raw image data
-    :param dir: directory for images
+    :param destdir: directory for images
     """
 
     if not os.path.isdir(destdir):
