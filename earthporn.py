@@ -204,7 +204,7 @@ if __name__ == '__main__':
         with open('earthporn.yaml', 'r') as f:
             config = yaml.load(f)
     except:
-        logging.warn('Config file earthporn.yaml not found')
+        logging.warning('Config file earthporn.yaml not found')
 
     parser = argparse.ArgumentParser(
         description='Download images from http://www.reddit.com/r/earthporn')
