@@ -175,13 +175,13 @@ def save_image(title, url, destdir):
 
 def keep_at_most(dest, count):
     rdir = Path(dest)
-    for f in sorted(rdir.glob(PREFIX_GLOB + '*' + SUFFIX_GLOB),
-                    key=lambda p: p.stat().st_mtime, reverse=True)[count:]:
-        logger.info("Deleting image %s", f)
+    for f_ in sorted(rdir.glob(PREFIX_GLOB + '*' + SUFFIX_GLOB),
+                     key=lambda p: p.stat().st_mtime, reverse=True)[count:]:
+        logger.info("Deleting image %s", f_)
         try:
-            f.unlink()
+            f_.unlink()
         except:
-            logger.exception("Failed to delete %s", f)
+            logger.exception("Failed to delete %s", f_)
 
 
 def main(count, dest, keepcount):
