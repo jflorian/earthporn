@@ -45,8 +45,8 @@ def get_filepath(destdir, title):
     return rpath
 
 
-def keep_image(title, res):
-    w, h = res.w, res.h
+def keep_image(title, res_):
+    w, h = res_.w, res_.h
     W, H = TARGET_RESOLUTION.w, TARGET_RESOLUTION.h
 
     if W - w > 4 * ACCEPTABLE_DIFFERENCE:
