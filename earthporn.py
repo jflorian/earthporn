@@ -180,7 +180,7 @@ def keep_at_most(dest, count):
         logger.info("Deleting image %s", f_)
         try:
             f_.unlink()
-        except:
+        except OSError:
             logger.exception("Failed to delete %s", f_)
 
 
@@ -205,7 +205,7 @@ if __name__ == '__main__':
     try:
         with open('earthporn.yaml', 'r') as f:
             config = yaml.load(f)
-    except:
+    except FileNotFoundError:
         logging.warning('Config file earthporn.yaml not found')
 
     parser = argparse.ArgumentParser(
