@@ -27,7 +27,8 @@ MAX_FILENAME_LENGTH = 30
 
 # From Reddit Enhancement Suite
 FLICKR_RE = re.compile(
-    '^https?:\/\/(?:\w+\.)?flickr\.com\/(?:.+)\/(\d{10,})(?:\/|$)')
+    '^https?://(?:\w+\.)?flickr\.com/(?:.+)/(\d{10,})(?:/|$)'
+)
 
 
 def safe_filename(title):
