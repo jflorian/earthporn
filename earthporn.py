@@ -51,18 +51,17 @@ def keep_image(title, res_):
 
     if tw - w > 4 * ACCEPTABLE_DIFFERENCE:
         # Smaller width, landscape
-        logger.debug('{%22r} Bad width (%dx%d) than target (%dx%d) ', title, w,
-                     h, tw, th)
+        logger.debug('{%22r} Rejecting: width (%d) < target (%d) ',
+                     title, w, tw)
         return False
     elif th - h > 4 * ACCEPTABLE_DIFFERENCE:
         # Smaller height, landscape
-        logger.debug('{%22r} Bad height (%dx%d) than target (%dx%d) ', title, w,
-                     h, tw, th)
+        logger.debug('{%22r} Rejecting: height (%d) < target (%d) ',
+                     title, h, th)
         return False
     elif w >= tw:
         # Greater width if landscape
-        logger.debug('{%22r} Greater width (%dx%d) than target (%dx%d) ', title,
-                     w, h, tw, th)
+        logger.debug('{%22r} Keeping: width (%d) > target (%d) ', title, w, tw)
         return True
 
     if h > w:
@@ -77,18 +76,18 @@ def keep_image(title, res_):
     if tw * th - w * h < ACCEPTABLE_DIFFERENCE ** 2:
         # Greater width, landscape, overall higher resolution
         logger.debug(
-            '{%22r} Bad resolution (%dx%d = %d) than target (%dx%d = %d) ',
+            '{%22r} Rejecting: resolution (%dx%d = %d) > target (%dx%d = %d) ',
             title, w, h, w * h, tw, th, tw * th)
         return False
 
     if tw / th - w / h > ACCEPTABLE_DIFFERENCE / 200.0:
         logger.debug(
-            '{%22r} Bad aspect ratio (%dx%d = %.3f) than target (%dx%d = '
-            '%.3f) ',
+            '{%22r} Rejecting: aspect ratio (%dx%d = %.3f) > '
+            'target (%dx%d = %.3f) ',
             title, w, h, w / h, tw, th, tw / th)
         return False
 
-    logger.debug('{%22r} Seems fine (%dx%d)', title, w, h)
+    logger.debug('{%22r} Keeping: seems fine (%dx%d)', title, w, h)
     return True
 
 
