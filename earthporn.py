@@ -45,7 +45,7 @@ def get_filepath(destdir, title):
 def keep_image(title, res):
     w, h = res.w, res.h
     W, H = TARGET_RESOLUTION.w, TARGET_RESOLUTION.h
-    
+
     if W - w > 4 * ACCEPTABLE_DIFFERENCE:
         # Smaller width, landscape
         logger.debug('{%22r} Bad width (%dx%d) than target (%dx%d) ', title, w, h, W, H)
@@ -58,7 +58,7 @@ def keep_image(title, res):
         # Greater width if landscape
         logger.debug('{%22r} Greater width (%dx%d) than target (%dx%d) ', title, w, h, W, H)
         return True
-    
+
     if h > w:
         # Portrait
         #~ # Reject
@@ -67,16 +67,16 @@ def keep_image(title, res):
         w, h = h, w
         W, H = H, W
         logger.debug('{%22r} Portrait image -> (%dx%d)', title, w, h)
-    
+
     if W * H - w * h < ACCEPTABLE_DIFFERENCE ** 2:
         # Greater width, landscape, overall higher resolution
         logger.debug('{%22r} Bad resolution (%dx%d = %d) than target (%dx%d = %d) ', title, w, h, w * h, W, H, W * H)
         return False
-    
+
     if W/H - w/h > ACCEPTABLE_DIFFERENCE / 200.0:
         logger.debug('{%22r} Bad aspect ratio (%dx%d = %.3f) than target (%dx%d = %.3f) ', title, w, h, w/h, W, H, W/H)
         return False
-    
+
     logger.debug('{%22r} Seems fine (%dx%d)', title, w, h)
     return True
 
@@ -88,7 +88,7 @@ def filtered_images(children, count):
             break
         if thread['data']['stickied']:
             continue
-        
+
         try:
             if thread['data']['domain'] == 'flickr.com' and FLICKR_RE.match(thread['data']['url']):
                 embed = requests.get('https://noembed.com/embed', params={'url': thread['data']['url']}).json()
@@ -177,7 +177,7 @@ if __name__ == '__main__':
     # Configure logging
     with open('logging.yaml', 'r') as f:
         logging.config.dictConfig(yaml.load(f))
-    
+
     # Load configuration file
     config = {
         'count': 10,
@@ -190,16 +190,16 @@ if __name__ == '__main__':
             config = yaml.load(f)
     except:
         logging.warn('Config file earthporn.yaml not found')
-    
+
     parser = argparse.ArgumentParser(description='Download images from http://www.reddit.com/r/earthporn')
     parser.add_argument('--count', '-c', help='number of images (max = 100)', type=int, default=config.get('count'))
     parser.add_argument('--dest', '-d', help='destination directory', type=str, default=config.get('dest'))
     parser.add_argument('--keepcount', '-k', help='number of images to keep in the directory (> count)', type=int, default=config.get('keepcount'))
     parser.add_argument('--resolution', '-r', help='resolution of the display, to filter out images that do not look good', type=str, default=config.get('resolution'))
     args = parser.parse_args()
-    
+
     logging.debug('Starting with config: %r', args)
-    
+
     res = args.resolution
     if res:
         TARGET_RESOLUTION = Resolution(*map(int, res.split('x')))
