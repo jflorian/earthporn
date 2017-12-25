@@ -47,22 +47,22 @@ def get_filepath(destdir, title):
 
 def keep_image(title, res_):
     w, h = res_.w, res_.h
-    W, H = TARGET_RESOLUTION.w, TARGET_RESOLUTION.h
+    tw, th = TARGET_RESOLUTION.w, TARGET_RESOLUTION.h
 
-    if W - w > 4 * ACCEPTABLE_DIFFERENCE:
+    if tw - w > 4 * ACCEPTABLE_DIFFERENCE:
         # Smaller width, landscape
         logger.debug('{%22r} Bad width (%dx%d) than target (%dx%d) ', title, w,
-                     h, W, H)
+                     h, tw, th)
         return False
-    elif H - h > 4 * ACCEPTABLE_DIFFERENCE:
+    elif th - h > 4 * ACCEPTABLE_DIFFERENCE:
         # Smaller height, landscape
         logger.debug('{%22r} Bad height (%dx%d) than target (%dx%d) ', title, w,
-                     h, W, H)
+                     h, tw, th)
         return False
-    elif w >= W:
+    elif w >= tw:
         # Greater width if landscape
         logger.debug('{%22r} Greater width (%dx%d) than target (%dx%d) ', title,
-                     w, h, W, H)
+                     w, h, tw, th)
         return True
 
     if h > w:
@@ -71,21 +71,21 @@ def keep_image(title, res_):
         # ~ return False
         # Flip the coordinates
         w, h = h, w
-        W, H = H, W
+        tw, th = th, tw
         logger.debug('{%22r} Portrait image -> (%dx%d)', title, w, h)
 
-    if W * H - w * h < ACCEPTABLE_DIFFERENCE ** 2:
+    if tw * th - w * h < ACCEPTABLE_DIFFERENCE ** 2:
         # Greater width, landscape, overall higher resolution
         logger.debug(
             '{%22r} Bad resolution (%dx%d = %d) than target (%dx%d = %d) ',
-            title, w, h, w * h, W, H, W * H)
+            title, w, h, w * h, tw, th, tw * th)
         return False
 
-    if W / H - w / h > ACCEPTABLE_DIFFERENCE / 200.0:
+    if tw / th - w / h > ACCEPTABLE_DIFFERENCE / 200.0:
         logger.debug(
             '{%22r} Bad aspect ratio (%dx%d = %.3f) than target (%dx%d = '
             '%.3f) ',
-            title, w, h, w / h, W, H, W / H)
+            title, w, h, w / h, tw, th, tw / th)
         return False
 
     logger.debug('{%22r} Seems fine (%dx%d)', title, w, h)
