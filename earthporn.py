@@ -133,7 +133,7 @@ def load_images(count):
     :param count: number of images to download from subreddit
     :returns: dict where keys are ids of threads and values are raw data
     """
-    logger.info("Getting url %s with count %d", JSON_URL, count)
+    logger.info("Getting url %r with count %d", JSON_URL, count)
     earthporn_json = requests.get(JSON_URL, headers=HEADERS).json()
 
     for thread, source_image in filtered_images(
