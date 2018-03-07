@@ -157,6 +157,9 @@ def save_images(images, destdir):
         os.makedirs(destdir)
 
     for title, data in images:
+        # Kludge for
+        # https://www.reddit.com/r/bugs/comments/4zpqks/uri_signature_match_failed/
+        data = data.replace('&amp;', '&')
         save_image(title, data, destdir)
 
 
