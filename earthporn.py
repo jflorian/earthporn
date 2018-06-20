@@ -18,7 +18,7 @@ logger = logging.getLogger('earthporn')
 
 Resolution = namedtuple('Resolution', 'w,h')
 
-JSON_URL = 'https://www.reddit.com/r/earthporn/hot.json?limit=100'
+JSON_URL = 'https://www.reddit.com/r/earthporn/hot.json?limit={}'
 HEADERS = {'User-Agent': 'script by /u/blissbero'}
 VALID_CHARS = frozenset("-_.()%s%s" % (string.ascii_letters, string.digits))
 PREFIX = 'DOWN-'
@@ -136,8 +136,9 @@ def load_images(count):
     :param count: number of images to download from subreddit
     :returns: dict where keys are ids of threads and values are raw data
     """
-    logger.info("Getting url %r with count %d", JSON_URL, count)
-    earthporn_json = requests.get(JSON_URL, headers=HEADERS).json()
+    url = JSON_URL.format(count)
+    logger.info("Getting url %r with count %d", url, count)
+    earthporn_json = requests.get(url, headers=HEADERS).json()
 
     for thread, source_image in filtered_images(
             earthporn_json['data']['children'], count):
