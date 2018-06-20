@@ -38,7 +38,11 @@ def safe_filename(title):
 
 
 def get_filepath(destdir, title, suffix):
-    filename = os.path.join(destdir, PREFIX + safe_filename(title)) + suffix
+    short_title = title if len(title) <= MAX_FILENAME_LENGTH else (
+            title[:MAX_FILENAME_LENGTH // 2] + '...' +
+            title[-MAX_FILENAME_LENGTH // 2:])
+    filename = os.path.join(destdir,
+                            PREFIX + safe_filename(short_title)) + suffix
     rpath = Path(filename)
     rdir = Path(destdir)
     assert rdir == rpath.parent
@@ -139,9 +143,6 @@ def load_images(count):
     for thread, source_image in filtered_images(
             earthporn_json['data']['children'], count):
         title = thread['data']['title']
-        if len(title) > MAX_FILENAME_LENGTH:
-            title = title[:MAX_FILENAME_LENGTH // 2] + '...' + \
-                    title[-MAX_FILENAME_LENGTH // 2:]
         title = '{}_{}'.format(thread['data']['id'], title)
         yield (title, source_image['url'])
 
