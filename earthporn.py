@@ -221,7 +221,7 @@ if __name__ == '__main__':
     with open('logging.yaml', 'r') as f:
         logging.config.dictConfig(yaml.load(f))
 
-    # Load configuration file
+    # start with internal default configuration
     config = {
         'count': 10,
         'dest': '~/Pictures',
@@ -229,9 +229,10 @@ if __name__ == '__main__':
         'minscore': 10000,
         'resolution': '1920x1080',
     }
+    # update those defaults using the configuration file
     try:
         with open('earthporn.yaml', 'r') as f:
-            config = yaml.load(f)
+            config.update(yaml.load(f))
     except FileNotFoundError:
         logging.warning('Config file earthporn.yaml not found')
 
