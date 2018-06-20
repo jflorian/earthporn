@@ -175,6 +175,8 @@ def save_image(title, url, destdir):
     data = requests.get(url, stream=True).raw.read()
     with path.open('wb') as img_file:
         img_file.write(data)
+    with open(get_filepath(destdir, title, '.txt'), 'w') as info:
+        info.write('Title:\t{}\nFile:\t{}\nURL:\t{}\n'.format(title, path, url))
 
 
 def keep_at_most(dest, count):
