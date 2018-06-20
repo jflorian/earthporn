@@ -54,16 +54,15 @@ def keep_image(title, res_):
 
     if tw - w > 4 * ACCEPTABLE_DIFFERENCE:
         # Smaller width, landscape
-        logger.debug('rejecting {%22r}: width (%d) < target (%d)', title, w, tw)
+        logger.debug('rejecting %22r: width (%d) < target (%d)', title, w, tw)
         return False
     elif th - h > 4 * ACCEPTABLE_DIFFERENCE:
         # Smaller height, landscape
-        logger.debug('rejecting {%22r}: height (%d) < target (%d)',
-                     title, h, th)
+        logger.debug('rejecting %22r: height (%d) < target (%d)', title, h, th)
         return False
     elif w >= tw:
         # Greater width if landscape
-        logger.debug('keeping {%22r}: width (%d) > target (%d)', title, w, tw)
+        logger.debug('keeping %22r: width (%d) > target (%d)', title, w, tw)
         return True
 
     if h > w:
@@ -73,23 +72,23 @@ def keep_image(title, res_):
         # Flip the coordinates
         w, h = h, w
         tw, th = th, tw
-        logger.debug('{%22r} Portrait image -> (%dx%d)', title, w, h)
+        logger.debug('%22r is a portrait (%dx%d) image', title, w, h)
 
     if tw * th - w * h < ACCEPTABLE_DIFFERENCE ** 2:
         # Greater width, landscape, overall higher resolution
         logger.debug(
-            'rejecting {%22r}: resolution (%dx%d = %d) > target (%dx%d = %d)',
+            'rejecting %22r: resolution (%dx%d = %d) > target (%dx%d = %d)',
             title, w, h, w * h, tw, th, tw * th)
         return False
 
     if tw / th - w / h > ACCEPTABLE_DIFFERENCE / 200.0:
         logger.debug(
-            'rejecting {%22r}: aspect ratio (%dx%d = %.3f) > '
+            'rejecting %22r: aspect ratio (%dx%d = %.3f) > '
             'target (%dx%d = %.3f)',
             title, w, h, w / h, tw, th, tw / th)
         return False
 
-    logger.debug('keeping {%22r}: seems fine (%dx%d)', title, w, h)
+    logger.debug('keeping %22r: seems fine (%dx%d)', title, w, h)
     return True
 
 
@@ -109,7 +108,7 @@ def filtered_images(children, count, minscore):
             continue
         score = thread['data']['score']
         if score < minscore:
-            logger.debug('rejecting {%22r}: insufficient score {:,d}',
+            logger.debug('rejecting %22r: insufficient score %d',
                          title, score)
             continue
 
