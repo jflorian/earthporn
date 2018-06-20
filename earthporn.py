@@ -94,12 +94,24 @@ def keep_image(title, res_):
     return True
 
 
-def filtered_images(children, count):
+def filtered_images(children, count, minscore):
+    """
+    :param children:
+    :param count:
+    :param minscore: Minimum required score to qualify.
+    :return:
+    """
     total = 0
     for thread in children:
         if total >= count:
             break
+        title = thread['data']['title']
         if thread['data']['stickied']:
+            continue
+        score = thread['data']['score']
+        if score < minscore:
+            logger.debug('rejecting {%22r}: insufficient score {:,d}',
+                         title, score)
             continue
 
         try:
@@ -129,11 +141,12 @@ def filtered_images(children, count):
         total += 1
 
 
-def load_images(count):
+def load_images(count, minscore):
     """
     Download images from /r/earthporn
 
     :param count: number of images to download from subreddit
+    :param minscore: Minimum required score to qualify.
     :returns: dict where keys are ids of threads and values are raw data
     """
     url = JSON_URL.format(count)
@@ -141,7 +154,7 @@ def load_images(count):
     earthporn_json = requests.get(url, headers=HEADERS).json()
 
     for thread, source_image in filtered_images(
-            earthporn_json['data']['children'], count):
+            earthporn_json['data']['children'], count, minscore):
         title = thread['data']['title']
         title = '{}_{}'.format(thread['data']['id'], title)
         yield (title, source_image['url'])
@@ -190,8 +203,15 @@ def keep_at_most(dest, count):
             logger.exception("Failed to delete %s", f_)
 
 
-def main(count, dest, keepcount):
-    save_images(load_images(count), dest)
+def main(count, minscore, dest, keepcount):
+    """
+    :param count:
+    :param minscore:
+        Minimum required score to qualify.
+    :param dest:
+    :param keepcount:
+    """
+    save_images(load_images(count, minscore), dest)
     if keepcount and keepcount > 0 and keepcount > count:
         keep_at_most(dest, keepcount)
 
@@ -206,6 +226,7 @@ if __name__ == '__main__':
         'count': 10,
         'dest': '~/Pictures',
         'keepcount': -1,
+        'minscore': 10000,
         'resolution': '1920x1080',
     }
     try:
@@ -224,6 +245,9 @@ if __name__ == '__main__':
                         help='number of images to keep in the directory (> '
                              'count)',
                         type=int, default=config.get('keepcount'))
+    parser.add_argument('--minscore', '-m',
+                        help='minimum required score',
+                        type=int, default=config.get('minscore'))
     parser.add_argument('--resolution', '-r',
                         help='resolution of the display, to filter out images '
                              'that do not look good',
@@ -235,6 +259,6 @@ if __name__ == '__main__':
     res = args.resolution
     if res:
         TARGET_RESOLUTION = Resolution(*map(int, res.split('x')))
-    main(args.count, args.dest, args.keepcount)
+    main(args.count, args.minscore, args.dest, args.keepcount)
     logging.debug('Done.')
     sys.exit(0)

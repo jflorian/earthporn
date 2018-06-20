@@ -1,4 +1,5 @@
 count: 20
 dest: C:\Users\jkik\Pictures\EarthPorn
 keepcount: 480
+minscore: 1000
 resolution: 1920x1080
