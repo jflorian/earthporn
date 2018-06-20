@@ -41,12 +41,11 @@ def get_filepath(destdir, title, suffix):
     short_title = title if len(title) <= MAX_FILENAME_LENGTH else (
             title[:MAX_FILENAME_LENGTH // 2] + '...' +
             title[-MAX_FILENAME_LENGTH // 2:])
-    filename = os.path.join(destdir,
-                            PREFIX + safe_filename(short_title)) + suffix
-    rpath = Path(filename)
-    rdir = Path(destdir)
-    assert rdir == rpath.parent
-    return rpath
+    return Path(
+        os.path.expanduser(
+            os.path.join(destdir, PREFIX + safe_filename(short_title)) + suffix
+        )
+    )
 
 
 def keep_image(title, res_):
