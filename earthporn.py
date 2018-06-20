@@ -21,7 +21,7 @@ Resolution = namedtuple('Resolution', 'w,h')
 JSON_URL = 'https://www.reddit.com/r/earthporn/hot.json?limit=100'
 HEADERS = {'User-Agent': 'script by /u/blissbero'}
 VALID_CHARS = frozenset("-_.()%s%s" % (string.ascii_letters, string.digits))
-PREFIX = PREFIX_GLOB = 'DOWN-'
+PREFIX = 'DOWN-'
 TARGET_RESOLUTION = Resolution(1920, 1080)
 ACCEPTABLE_DIFFERENCE = 90
 MAX_FILENAME_LENGTH = 30
@@ -181,7 +181,7 @@ def save_image(title, url, destdir):
 
 def keep_at_most(dest, count):
     rdir = Path(dest)
-    for f_ in sorted(rdir.glob(PREFIX_GLOB + '*'),
+    for f_ in sorted(rdir.glob(PREFIX + '*'),
                      key=lambda p: p.stat().st_mtime, reverse=True)[count:]:
         logger.info("Deleting image %s", f_)
         try:
