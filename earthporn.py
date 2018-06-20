@@ -7,6 +7,7 @@ import os
 import re
 import string
 import sys
+import urllib
 from collections import namedtuple
 from pathlib import Path
 
@@ -21,7 +22,6 @@ JSON_URL = 'https://www.reddit.com/r/earthporn/hot.json?limit=100'
 HEADERS = {'User-Agent': 'script by /u/blissbero'}
 VALID_CHARS = frozenset("-_.()%s%s" % (string.ascii_letters, string.digits))
 PREFIX = PREFIX_GLOB = 'DOWN-'
-SUFFIX = SUFFIX_GLOB = '.jpg'
 TARGET_RESOLUTION = Resolution(1920, 1080)
 ACCEPTABLE_DIFFERENCE = 90
 MAX_FILENAME_LENGTH = 30
@@ -37,8 +37,8 @@ def safe_filename(title):
         c for c in title.replace(' ', '_') if c in VALID_CHARS).strip(' _.-()')
 
 
-def get_filepath(destdir, title):
-    filename = os.path.join(destdir, PREFIX + safe_filename(title)) + SUFFIX
+def get_filepath(destdir, title, suffix):
+    filename = os.path.join(destdir, PREFIX + safe_filename(title)) + suffix
     rpath = Path(filename)
     rdir = Path(destdir)
     assert rdir == rpath.parent
@@ -164,7 +164,8 @@ def save_images(images, destdir):
 
 
 def save_image(title, url, destdir):
-    path = get_filepath(destdir, title)
+    suffix = os.path.splitext(urllib.parse.urlsplit(url).path)[1]
+    path = get_filepath(destdir, title, suffix)
     logger.info("Saving image %r to %s", title, path)
     if path.exists():
         logger.debug("Already saved. Skipping...")
@@ -177,7 +178,7 @@ def save_image(title, url, destdir):
 
 def keep_at_most(dest, count):
     rdir = Path(dest)
-    for f_ in sorted(rdir.glob(PREFIX_GLOB + '*' + SUFFIX_GLOB),
+    for f_ in sorted(rdir.glob(PREFIX_GLOB + '*'),
                      key=lambda p: p.stat().st_mtime, reverse=True)[count:]:
         logger.info("Deleting image %s", f_)
         try:
