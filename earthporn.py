@@ -178,11 +178,10 @@ def save_images(images, destdir):
 def save_image(title, url, destdir):
     suffix = os.path.splitext(urllib.parse.urlsplit(url).path)[1]
     path = get_filepath(destdir, title, suffix)
-    logger.info("Saving image %r to %s", title, path)
     if path.exists():
-        logger.debug("Already saved. Skipping...")
-        path.touch()
+        logger.debug('skipping %22r: already acquired', title)
         return
+    logger.info("Saving image %r to %s", title, path)
     data = requests.get(url, stream=True).raw.read()
     with path.open('wb') as img_file:
         img_file.write(data)
