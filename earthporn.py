@@ -209,7 +209,7 @@ def main(count, minscore, dest, keepcount):
     :param keepcount:
     """
     save_images(load_images(count, minscore), dest)
-    if keepcount and keepcount > 0 and keepcount > count:
+    if keepcount and keepcount > count:
         keep_at_most(dest, keepcount)
 
 
@@ -222,7 +222,7 @@ if __name__ == '__main__':
     config = {
         'count': 10,
         'dest': '~/Pictures',
-        'keepcount': -1,
+        'keepcount': None,
         'minscore': 10000,
         'resolution': '1920x1080',
     }
@@ -251,6 +251,9 @@ if __name__ == '__main__':
                              'that do not look good',
                         type=str, default=config.get('resolution'))
     args = parser.parse_args()
+
+    if args.keepcount and args.keepcount <= args.count:
+        parser.error('keepcount, if set, must be greater than count')
 
     logging.debug('Starting with config: %r', args)
 
