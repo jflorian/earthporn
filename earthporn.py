@@ -42,9 +42,7 @@ def get_filepath(destdir, title, suffix):
             title[:MAX_FILENAME_LENGTH // 2] + '...' +
             title[-MAX_FILENAME_LENGTH // 2:])
     return Path(
-        os.path.expanduser(
             os.path.join(destdir, PREFIX + safe_filename(short_title)) + suffix
-        )
     )
 
 
@@ -208,6 +206,7 @@ def main(count, minscore, dest, keepcount):
     :param dest:
     :param keepcount:
     """
+    dest = os.path.expanduser(dest)
     save_images(load_images(count, minscore), dest)
     if keepcount and keepcount > count:
         keep_at_most(dest, keepcount)
