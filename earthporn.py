@@ -9,6 +9,7 @@ import string
 import sys
 import urllib
 from collections import namedtuple
+from itertools import filterfalse
 from pathlib import Path
 
 import requests
@@ -188,14 +189,18 @@ def save_image(title, url, destdir):
 
 
 def keep_at_most(dest, count):
-    rdir = Path(dest)
-    for f_ in sorted(rdir.glob(PREFIX + '*'),
-                     key=lambda p: p.stat().st_mtime, reverse=True)[count:]:
-        logger.info("Deleting image %s", f_)
-        try:
-            f_.unlink()
-        except OSError:
-            logger.exception("Failed to delete %s", f_)
+    all_files = Path(dest).glob(PREFIX + '*')
+    images = filterfalse(lambda p: p.match('*.txt'), all_files)
+    oldest_images = sorted(images, key=lambda p: p.stat().st_mtime,
+                           reverse=True)[count:]
+    for f_ in oldest_images:
+        dirname, basename = os.path.split(f_)
+        for target in Path(dirname).glob(os.path.splitext(basename)[0] + '.*'):
+            logger.info("Deleting file %s", target)
+            try:
+                f_.unlink()
+            except OSError:
+                logger.exception("Failed to delete %s", f_)
 
 
 def main(count, minscore, dest, keepcount):
